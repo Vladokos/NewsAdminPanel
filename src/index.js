@@ -116,6 +116,14 @@ class Panel extends React.Component {
 class Article extends React.Component {
   constructor(props) {
     super(props);
+
+    //change name
+    this.change = this.change.bind(this);
+  }
+  //change name
+  change(ev) {
+    console.log(ev.target.innerHTML);
+    ev.target.innerHTML = "nosochki";
   }
   render() {
     return (
@@ -124,7 +132,10 @@ class Article extends React.Component {
         <div>Title:{this.props.title}</div>
         <div className="text">
           Text:
-          <p>{this.props.text}</p>
+          {/* Change id. preferably random */}
+          <p id="sonik" onClick={this.change}>
+            {this.props.text}
+          </p>
         </div>
       </div>
     );
