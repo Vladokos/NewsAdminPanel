@@ -12,25 +12,27 @@ class Panel extends React.Component {
       text: "",
     };
 
-    this.handleChange = this.handleChange.bind(this);
+    this.articleCreate = this.articleCreate.bind(this);
   }
 
-  handleChange(event) {
-    switch (event.target.id) {
+  articleCreate(inputLine) {
+    switch (inputLine.target.id) {
       case "category":
         this.setState({
-          categories: event.target.value,
+          categories: inputLine.target.value,
         });
         break;
       case "title":
         this.setState({
-          title: event.target.value,
+          title: inputLine.target.value,
         });
         break;
       case "text":
         this.setState({
-          text: event.target.value,
+          text: inputLine.target.value,
         });
+        break;
+      default:
         break;
     }
   }
@@ -80,17 +82,17 @@ class Panel extends React.Component {
                   <li>
                     Enter category:
                     <br />
-                    <input id="category" onChange={this.handleChange} />
+                    <input id="category" onChange={this.articleCreate} />
                   </li>
                   <li>
                     Enter title:
                     <br />
-                    <input id="title" onChange={this.handleChange} />
+                    <input id="title" onChange={this.articleCreate} />
                   </li>
                   <li>
                     Enter text:
                     <br />
-                    <textarea id="text" onChange={this.handleChange} />
+                    <textarea id="text" onChange={this.articleCreate} />
                   </li>
                   <li>
                     Load image:
@@ -120,7 +122,10 @@ class Article extends React.Component {
       <div>
         <div>Category:{this.props.category}</div>
         <div>Title:{this.props.title}</div>
-        <div>Text:{this.props.text}</div>
+        <div className="text">
+          Text:
+          <p>{this.props.text}</p>
+        </div>
       </div>
     );
   }
