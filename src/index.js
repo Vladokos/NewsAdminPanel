@@ -6,46 +6,7 @@ class Panel extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = {
-      categories: "",
-      title: "",
-      text: "",
-
-      enterIsClicked: false,
-    };
-
-    this.articleCreate = this.articleCreate.bind(this);
-    this.keychek = this.keychek.bind(this);
-  }
-
-  keychek(e){
-    if (e.charCode === 13){
-      console.log("bb");
-    }
-  }
-
-  articleCreate(inputLine) {
-    
-    switch (inputLine.target.id) {
-      case "category":
-        this.setState({
-          categories: inputLine.target.value,
-        });
-        break;
-      case "title":
-        this.setState({
-          title: inputLine.target.value,
-        });
-        break;
-      case "text":
-        this.setState({
-          text: inputLine.target.value,
-        });
-        
-        break;
-      default:
-        break;
-    }
+    this.state = {};
   }
 
   render() {
@@ -86,72 +47,86 @@ class Panel extends React.Component {
                 <button>Italics</button>
               </li>
             </ul>
-            <form>
-              <fieldset>
-                <legend>Create an article</legend>
-                <ul>
-                  <li>
-                    Enter category:
-                    <br />
-                    <input id="category" onChange={this.articleCreate} />
-                  </li>
-                  <li>
-                    Enter title:
-                    <br />
-                    <input id="title" onChange={this.articleCreate} />
-                  </li>
-                  <li>
-                    Enter text:
-                    <br />
-                    <textarea id="text" onChange={this.articleCreate}  onKeyPress={this.keychek}/>
-                  </li>
-                  <li>
-                    Load image:
-                    <br />
-                    <input type="file" />
-                  </li>
-                </ul>
-              </fieldset>
-            </form>
           </div>
         </div>
-        <Article
-          category={this.state.categories}
-          title={this.state.title}
-          text={this.state.text}
-        />
+        <Article />
       </div>
     );
   }
 }
 
-let texts = {
-
-}
+let texts = {};
 class Article extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      count: 0,
+      categories: "",
+      title: "",
+      text: "",
       textCopy: "",
+      count: 0,
     };
 
     //change name
     this.change = this.change.bind(this);
     this.upda = this.upda.bind(this);
+
+    this.articleCreate = this.articleCreate.bind(this);
+    this.keychek = this.keychek.bind(this);
+    this.clears = this.clears.bind(this);
     // this.renderString = this.renderString.bind(this);
   }
+  //change input e
+  keychek(e) {
+    if (e.charCode === 13) {
+      this.clears();
+      this.upda();
+      this.renderString();
+    }
+  }
+
+  articleCreate(inputLine) {
+    switch (inputLine.target.id) {
+      case "category":
+        this.setState({
+          categories: inputLine.target.value,
+        });
+        break;
+      case "title":
+        this.setState({
+          title: inputLine.target.value,
+        });
+        break;
+      case "text":
+        this.setState({
+          text: inputLine.target.value,
+        });
+
+        break;
+      default:
+        break;
+    }
+  }
+  //change name or function
+  //change input e
+  clears() {
+    this.setState((state) => ({
+      textCopy: (state.textCopy = ""),
+    }));
+  }
+
   //change name
   change(ev) {
     console.log(ev.target.innerHTML);
     ev.target.innerHTML = "nosochki";
   }
-
+  //change name
   upda() {
     this.setState((state) => ({
       count: (state.count += 1),
-      textCopy: (state.textCopy = this.props.text),
+      textCopy: (state.textCopy = this.state.text),
+      text: (state.text = ""),
     }));
   }
 
@@ -160,6 +135,7 @@ class Article extends React.Component {
 
     let count = this.state.count;
     texts[count] = this.state.textCopy;
+
     // console.log(texts);
 
     while (count--) {
@@ -167,18 +143,52 @@ class Article extends React.Component {
     }
 
     // console.log(pargraph);
+
     return pargraph.reverse();
   }
 
   render() {
     return (
       <div>
-        <div>Category:{this.props.category}</div>
-        <div>Title:{this.props.title}</div>
-        <div className="text">
-          Text:
-          <button onClick={this.upda}>click</button>
-          {this.renderString()}
+        <form>
+          <fieldset>
+            <legend>Create an article</legend>
+            <ul>
+              <li>
+                Enter category:
+                <br />
+                <input id="category" onChange={this.articleCreate} />
+              </li>
+              <li>
+                Enter title:
+                <br />
+                <input id="title" onChange={this.articleCreate} />
+              </li>
+              <li>
+                Enter text:
+                <br />
+                <textarea
+                  id="text"
+                  onChange={this.articleCreate}
+                  onKeyPress={this.keychek}
+                  value={this.state.text}
+                />
+              </li>
+              <li>
+                Load image:
+                <br />
+                <input type="file" />
+              </li>
+            </ul>
+          </fieldset>
+        </form>
+        <div>
+          <div>Category:{this.state.categories}</div>
+          <div>Title:{this.state.title}</div>
+          <div className="text">
+            Text:
+            {this.renderString()}
+          </div>
         </div>
       </div>
     );

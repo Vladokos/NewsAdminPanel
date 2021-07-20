@@ -16,3 +16,9 @@ code {
   /* margin: 0 0 100em 0; */
   height: 100em;
 }
+p{
+  width: 650px;
+  margin: 20px auto;
+  font-size: 20px;
+  line-height: 28px;
+}
