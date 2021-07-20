@@ -66,6 +66,8 @@ class Article extends React.Component {
       text: "",
       textCopy: "",
       count: 0,
+      textEdit: "",
+      kostils: false,
     };
 
     //change name
@@ -75,7 +77,8 @@ class Article extends React.Component {
     this.articleCreate = this.articleCreate.bind(this);
     this.keychek = this.keychek.bind(this);
     this.clears = this.clears.bind(this);
-    // this.renderString = this.renderString.bind(this);
+
+    this.kostil = this.kostil.bind(this);
   }
   //change input e
   keychek(e) {
@@ -118,9 +121,29 @@ class Article extends React.Component {
 
   //change name
   change(ev) {
-    console.log(ev.target.innerHTML);
-    ev.target.innerHTML = "nosochki";
+    if (this.state.kostils === false) {
+      this.setState((state) => ({
+        textEdit: (state.textEdit = ev.target.innerHTML),
+      }));
+    }
+
+    if (this.state.kostils === true) {
+      ev.target.innerHTML = this.state.textEdit;
+      this.setState((state) => ({
+        kostils: (state.kostils = false),
+      }));
+    }
+    // ev.target.innerHTML = "nosochki";
   }
+  kostil(e) {
+    this.change();
+    this.setState((state) => ({
+      textEdit: (state.textEdit = e.target.value),
+      kostils: (state.kostils = true),
+    }));
+  }
+  // ↑ Delet kostil and create normal move
+
   //change name
   upda() {
     this.setState((state) => ({
@@ -139,7 +162,11 @@ class Article extends React.Component {
     // console.log(texts);
 
     while (count--) {
-      pargraph.push(<p key={count}>{texts[count + 1]}</p>);
+      pargraph.push(
+        <p key={count} onClick={this.change}>
+          {texts[count + 1]}
+        </p>
+      );
     }
 
     // console.log(pargraph);
@@ -173,6 +200,9 @@ class Article extends React.Component {
                   onKeyPress={this.keychek}
                   value={this.state.text}
                 />
+              </li>
+              <li>
+                <textarea value={this.state.textEdit} onChange={this.kostil} />
               </li>
               <li>
                 Load image:
