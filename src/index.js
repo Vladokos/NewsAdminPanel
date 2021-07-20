@@ -10,12 +10,22 @@ class Panel extends React.Component {
       categories: "",
       title: "",
       text: "",
+
+      enterIsClicked: false,
     };
 
     this.articleCreate = this.articleCreate.bind(this);
+    this.keychek = this.keychek.bind(this);
+  }
+
+  keychek(e){
+    if (e.charCode === 13){
+      console.log("bb");
+    }
   }
 
   articleCreate(inputLine) {
+    
     switch (inputLine.target.id) {
       case "category":
         this.setState({
@@ -31,6 +41,7 @@ class Panel extends React.Component {
         this.setState({
           text: inputLine.target.value,
         });
+        
         break;
       default:
         break;
@@ -92,7 +103,7 @@ class Panel extends React.Component {
                   <li>
                     Enter text:
                     <br />
-                    <textarea id="text" onChange={this.articleCreate} />
+                    <textarea id="text" onChange={this.articleCreate}  onKeyPress={this.keychek}/>
                   </li>
                   <li>
                     Load image:
@@ -113,18 +124,52 @@ class Panel extends React.Component {
     );
   }
 }
+
+let texts = {
+
+}
 class Article extends React.Component {
   constructor(props) {
     super(props);
 
+    this.state = {
+      count: 0,
+      textCopy: "",
+    };
+
     //change name
     this.change = this.change.bind(this);
+    this.upda = this.upda.bind(this);
+    // this.renderString = this.renderString.bind(this);
   }
   //change name
   change(ev) {
     console.log(ev.target.innerHTML);
     ev.target.innerHTML = "nosochki";
   }
+
+  upda() {
+    this.setState((state) => ({
+      count: (state.count += 1),
+      textCopy: (state.textCopy = this.props.text),
+    }));
+  }
+
+  renderString() {
+    let pargraph = [];
+
+    let count = this.state.count;
+    texts[count] = this.state.textCopy;
+    // console.log(texts);
+
+    while (count--) {
+      pargraph.push(<p key={count}>{texts[count + 1]}</p>);
+    }
+
+    // console.log(pargraph);
+    return pargraph.reverse();
+  }
+
   render() {
     return (
       <div>
@@ -132,10 +177,8 @@ class Article extends React.Component {
         <div>Title:{this.props.title}</div>
         <div className="text">
           Text:
-          {/* Change id. preferably random */}
-          <p id="sonik" onClick={this.change}>
-            {this.props.text}
-          </p>
+          <button onClick={this.upda}>click</button>
+          {this.renderString()}
         </div>
       </div>
     );
