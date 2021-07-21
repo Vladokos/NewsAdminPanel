@@ -67,26 +67,16 @@ class Article extends React.Component {
       textCopy: "",
       count: 0,
       textEdit: "",
-      kostils: false,
+      numOfstring: 0,
     };
 
     //change name
     this.change = this.change.bind(this);
     this.upda = this.upda.bind(this);
+    this.changeText = this.changeText.bind(this);
 
     this.articleCreate = this.articleCreate.bind(this);
     this.keychek = this.keychek.bind(this);
-    this.clears = this.clears.bind(this);
-
-    this.kostil = this.kostil.bind(this);
-  }
-  //change input e
-  keychek(e) {
-    if (e.charCode === 13) {
-      this.clears();
-      this.upda();
-      this.renderString();
-    }
   }
 
   articleCreate(inputLine) {
@@ -111,39 +101,14 @@ class Article extends React.Component {
         break;
     }
   }
-  //change name or function
+
   //change input e
-  clears() {
-    this.setState((state) => ({
-      textCopy: (state.textCopy = ""),
-    }));
-  }
-
-  //change name
-  change(ev) {
-    if (this.state.kostils === false) {
-      this.setState((state) => ({
-        textEdit: (state.textEdit = ev.target.innerHTML),
-      }));
+  keychek(e) {
+    if (e.charCode === 13) {
+      this.upda();
+      this.renderString();
     }
-
-    if (this.state.kostils === true) {
-      ev.target.innerHTML = this.state.textEdit;
-      this.setState((state) => ({
-        kostils: (state.kostils = false),
-      }));
-    }
-    // ev.target.innerHTML = "nosochki";
   }
-  kostil(e) {
-    this.change();
-    this.setState((state) => ({
-      textEdit: (state.textEdit = e.target.value),
-      kostils: (state.kostils = true),
-    }));
-  }
-  // ↑ Delet kostil and create normal move
-
   //change name
   upda() {
     this.setState((state) => ({
@@ -153,23 +118,35 @@ class Article extends React.Component {
     }));
   }
 
+  //change name
+  change(ev) {
+    this.setState((state) => ({
+      numOfstring: (state.numOfstring = ev.target.id),
+      textEdit: (state.textEdit = ev.target.innerHTML),
+    }));
+  }
+  changeText(e) {
+    this.setState((state) => ({
+      textEdit: (state.textEdit = e.target.value),
+    }));
+    texts[this.state.numOfstring] = this.state.textEdit;
+    console.log(this.state.textEdit);
+    console.log(texts[this.state.numOfstring]);
+  }
+
   renderString() {
     let pargraph = [];
 
     let count = this.state.count;
     texts[count] = this.state.textCopy;
 
-    // console.log(texts);
-
     while (count--) {
       pargraph.push(
-        <p key={count} onClick={this.change}>
+        <p key={count} onClick={this.change} id={count + 1}>
           {texts[count + 1]}
         </p>
       );
     }
-
-    // console.log(pargraph);
 
     return pargraph.reverse();
   }
@@ -202,7 +179,10 @@ class Article extends React.Component {
                 />
               </li>
               <li>
-                <textarea value={this.state.textEdit} onChange={this.kostil} />
+                <textarea
+                  value={this.state.textEdit}
+                  onChange={this.changeText}
+                />
               </li>
               <li>
                 Load image:
