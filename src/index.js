@@ -126,12 +126,19 @@ class Article extends React.Component {
     }));
   }
   changeText(e) {
-    this.setState((state) => ({
-      textEdit: (state.textEdit = e.target.value),
-    }));
+    if (this.state.textCopy === this.state.textEdit) {
+      this.setState((state) => ({
+        textEdit: (state.textEdit = e.target.value),
+        textCopy: (state.textCopy = this.state.textEdit),
+      }));
+    } else {
+    this.setState({
+      textEdit: this.state.textEdit = e.target.value,
+    });
+    }
     texts[this.state.numOfstring] = this.state.textEdit;
-    console.log(this.state.textEdit);
-    console.log(texts[this.state.numOfstring]);
+    console.log(this.state.textEdit + " (is state text edit)");
+    // console.log(texts[this.state.numOfstring]);
   }
 
   renderString() {
