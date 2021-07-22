@@ -24,6 +24,8 @@ p{
 }
 .hidden{
   visibility: hidden;
+  width: 0;
+  height: 0;
 }
 .textEditOpen{
   visibility: visible;
