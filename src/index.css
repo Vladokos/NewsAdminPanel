@@ -22,3 +22,9 @@ p{
   font-size: 20px;
   line-height: 28px;
 }
+.hidden{
+  visibility: hidden;
+}
+.textEditOpen{
+  visibility: visible;
+}

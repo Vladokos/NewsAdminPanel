@@ -68,18 +68,19 @@ class Article extends React.Component {
       count: 0,
       textEdit: "",
       numOfstring: 0,
+      textEditIsOpen: false,
     };
 
-    //change name
-    this.change = this.change.bind(this);
-    this.upda = this.upda.bind(this);
-    this.changeText = this.changeText.bind(this);
-
-    this.articleCreate = this.articleCreate.bind(this);
-    this.keychek = this.keychek.bind(this);
+    this.getInformationAboutParagraph =
+      this.getInformationAboutParagraph.bind(this);
+    this.addNewParagraph = this.addNewParagraph.bind(this);
+    this.changeParagraph = this.changeParagraph.bind(this);
+    this.informationAboutArticle = this.informationAboutArticle.bind(this);
+    this.keyChekOnCreatParagraph = this.keyChekOnCreatParagraph.bind(this);
+    this.keyChekOnEditParagraph = this.keyChekOnEditParagraph.bind(this);
   }
 
-  articleCreate(inputLine) {
+  informationAboutArticle(inputLine) {
     switch (inputLine.target.id) {
       case "category":
         this.setState({
@@ -102,43 +103,19 @@ class Article extends React.Component {
     }
   }
 
-  //change input e
-  keychek(e) {
-    if (e.charCode === 13) {
-      this.upda();
+  keyChekOnCreatParagraph(button) {
+    if (button.charCode === 13) {
+      this.addNewParagraph();
       this.renderString();
     }
   }
-  //change name
-  upda() {
+
+  addNewParagraph() {
     this.setState((state) => ({
       count: (state.count += 1),
       textCopy: (state.textCopy = this.state.text),
       text: (state.text = ""),
     }));
-  }
-
-  //change name
-  change(ev) {
-    this.setState((state) => ({
-      numOfstring: (state.numOfstring = ev.target.id),
-      textEdit: (state.textEdit = ev.target.innerHTML),
-    }));
-  }
-  changeText(e) {
-    if (this.state.textCopy === this.state.textEdit) {
-      this.setState((state) => ({
-        textEdit: (state.textEdit = e.target.value),
-        textCopy: (state.textCopy = this.state.textEdit),
-      }));
-    } else {
-    this.setState({
-      textEdit: this.state.textEdit = e.target.value,
-    });
-    }
-    texts[this.state.numOfstring] = this.state.textEdit;
-    console.log(this.state.textEdit + " (is state text edit)");
-    // console.log(texts[this.state.numOfstring]);
   }
 
   renderString() {
@@ -149,13 +126,50 @@ class Article extends React.Component {
 
     while (count--) {
       pargraph.push(
-        <p key={count} onClick={this.change} id={count + 1}>
+        <p
+          key={count}
+          onClick={this.getInformationAboutParagraph}
+          onMouseDown={this.keyChekOnEditParagraph}
+          id={count + 1}
+        >
           {texts[count + 1]}
         </p>
       );
     }
 
     return pargraph.reverse();
+  }
+
+  getInformationAboutParagraph(paragraph) {
+    this.setState((state) => ({
+      numOfstring: (state.numOfstring = paragraph.target.id),
+      textEdit: (state.textEdit = paragraph.target.innerHTML),
+    }));
+  }
+
+  changeParagraph(typedText) {
+    if (this.state.textCopy === this.state.textEdit) {
+      this.setState((state) => ({
+        textEdit: (state.textEdit = typedText.target.value),
+        textCopy: (state.textCopy = this.state.textEdit),
+      }));
+    } else {
+      this.setState({
+        textEdit: (this.state.textEdit = typedText.target.value),
+      });
+    }
+    texts[this.state.numOfstring] = this.state.textEdit;
+  }
+  keyChekOnEditParagraph(button){
+    if (button.charCode === 13){
+      this.setState({
+        textEditIsOpen: !this.state.textEditIsOpen,
+      });
+    }else if (button.type === "mousedown"){
+      this.setState({
+        textEditIsOpen: true,
+      });
+    }
   }
 
   render() {
@@ -168,27 +182,28 @@ class Article extends React.Component {
               <li>
                 Enter category:
                 <br />
-                <input id="category" onChange={this.articleCreate} />
+                <input id="category" onChange={this.informationAboutArticle} />
               </li>
               <li>
                 Enter title:
                 <br />
-                <input id="title" onChange={this.articleCreate} />
+                <input id="title" onChange={this.informationAboutArticle} />
               </li>
               <li>
                 Enter text:
                 <br />
                 <textarea
                   id="text"
-                  onChange={this.articleCreate}
-                  onKeyPress={this.keychek}
+                  onChange={this.informationAboutArticle}
+                  onKeyPress={this.keyChekOnCreatParagraph}
                   value={this.state.text}
                 />
               </li>
-              <li>
-                <textarea
+              <li className={this.state.textEditIsOpen ? "textEditOpen": "hidden"}>
+                <textarea 
                   value={this.state.textEdit}
-                  onChange={this.changeText}
+                  onChange={this.changeParagraph}
+                  onKeyPress={this.keyChekOnEditParagraph}
                 />
               </li>
               <li>
