@@ -69,6 +69,7 @@ class Article extends React.Component {
       textEdit: "",
       numOfstring: 0,
       textEditIsOpen: false,
+      countCopy: 0,
     };
 
     this.getInformationAboutParagraph =
@@ -78,6 +79,7 @@ class Article extends React.Component {
     this.informationAboutArticle = this.informationAboutArticle.bind(this);
     this.keyChekOnCreatParagraph = this.keyChekOnCreatParagraph.bind(this);
     this.keyChekOnEditParagraph = this.keyChekOnEditParagraph.bind(this);
+    this.addStyleFont = this.addStyleFont.bind(this);
   }
 
   informationAboutArticle(inputLine) {
@@ -96,7 +98,6 @@ class Article extends React.Component {
         this.setState({
           text: inputLine.target.value,
         });
-
         break;
       default:
         break;
@@ -104,7 +105,7 @@ class Article extends React.Component {
   }
 
   keyChekOnCreatParagraph(button) {
-    if (button.charCode === 13) {
+    if (button.charCode === 13 && this.state.text.trim() !== "") {
       this.addNewParagraph();
       this.renderString();
     }
@@ -124,6 +125,10 @@ class Article extends React.Component {
     let count = this.state.count;
     texts[count] = this.state.textCopy;
 
+    function convertingString() {
+      return { __html: texts[count + 1] };
+    }
+
     while (count--) {
       pargraph.push(
         <p
@@ -131,14 +136,15 @@ class Article extends React.Component {
           onClick={this.getInformationAboutParagraph}
           onMouseDown={this.keyChekOnEditParagraph}
           id={count + 1}
-        >
-          {texts[count + 1]}
-        </p>
+          dangerouslySetInnerHTML={convertingString()}
+        ></p>
       );
     }
 
     return pargraph.reverse();
   }
+
+  //edit article
 
   getInformationAboutParagraph(paragraph) {
     this.setState((state) => ({
@@ -160,18 +166,37 @@ class Article extends React.Component {
     }
     texts[this.state.numOfstring] = this.state.textEdit;
   }
-  keyChekOnEditParagraph(button){
-    if (button.charCode === 13){
+
+  keyChekOnEditParagraph(button) {
+    if (button.charCode === 13) {
       this.setState({
         textEditIsOpen: !this.state.textEditIsOpen,
       });
-    }else if (button.type === "mousedown"){
+    } else if (button.type === "mousedown") {
       this.setState({
         textEditIsOpen: true,
       });
     }
   }
 
+  //edit article
+
+  addStyleFont(button) {
+    switch (button.target.id) {
+      case "bold":
+        this.setState((state) => ({
+          text: (state.text += "<b></b>"),
+        }));
+        break;
+      case "italica":
+        this.setState((state) => ({
+          text: (state.text += "<i></i>"),
+        }));
+        break;
+      default:
+        break;
+    }
+  }
   render() {
     return (
       <div>
@@ -189,6 +214,28 @@ class Article extends React.Component {
                 <br />
                 <input id="title" onChange={this.informationAboutArticle} />
               </li>
+              <ul>
+                <li>
+                  Bold:
+                  <button id="bold" type="button" onClick={this.addStyleFont}>
+                    add bold
+                  </button>
+                </li>
+                <li>
+                  Italic:
+                  <button
+                    id="italica"
+                    type="button"
+                    onClick={this.addStyleFont}
+                  >
+                    add Italic
+                  </button>
+                </li>
+                <li>
+                  Link:
+                  <button>add Link</button>
+                </li>
+              </ul>
               <li>
                 Enter text:
                 <br />
@@ -199,17 +246,16 @@ class Article extends React.Component {
                   value={this.state.text}
                 />
               </li>
-              <li className={this.state.textEditIsOpen ? "textEditOpen": "hidden"}>
-                <textarea 
+              <li
+                className={
+                  this.state.textEditIsOpen ? "textEditOpen" : "hidden"
+                }
+              >
+                <textarea
                   value={this.state.textEdit}
                   onChange={this.changeParagraph}
                   onKeyPress={this.keyChekOnEditParagraph}
                 />
-              </li>
-              <li>
-                Load image:
-                <br />
-                <input type="file" />
               </li>
             </ul>
           </fieldset>
