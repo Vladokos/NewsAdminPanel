@@ -6,56 +6,25 @@ class Panel extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = {};
+    this.state = {
+    };
   }
-
   render() {
     return (
       <div>
         <div>
           <h1>Admin Panel</h1>
         </div>
-        <div>
-          <ul>
-            <li>
-              <button>Create article</button>
-            </li>
-            <li>
-              <button>See articles</button>
-            </li>
-            <li>
-              <button>Change article</button>
-            </li>
-          </ul>
-        </div>
         <div className="panelCreateAritcle">
-          <div>
-            <h2>Crate panel</h2>
-          </div>
-          <div>
-            <ul>
-              <li>
-                <button>Publish article</button>
-              </li>
-              <li>
-                <button>Clear</button>
-              </li>
-              <li>
-                <button>Bold</button>
-              </li>
-              <li>
-                <button>Italics</button>
-              </li>
-            </ul>
-          </div>
+          <Article seeArticles={this.state.seeArticle} />
         </div>
-        <Article />
       </div>
     );
   }
 }
 
 let texts = {};
+let state = false;
 class Article extends React.Component {
   constructor(props) {
     super(props);
@@ -69,7 +38,6 @@ class Article extends React.Component {
       textEdit: "",
       numOfstring: 0,
       textEditIsOpen: false,
-      countCopy: 0,
     };
 
     this.getInformationAboutParagraph =
@@ -80,6 +48,7 @@ class Article extends React.Component {
     this.keyChekOnCreatParagraph = this.keyChekOnCreatParagraph.bind(this);
     this.keyChekOnEditParagraph = this.keyChekOnEditParagraph.bind(this);
     this.addStyleFont = this.addStyleFont.bind(this);
+    this.clearAll = this.clearAll.bind(this);
   }
 
   informationAboutArticle(inputLine) {
@@ -193,13 +162,61 @@ class Article extends React.Component {
           text: (state.text += "<i></i>"),
         }));
         break;
+      case "link":
+        this.setState((state) => ({
+          text: (state.text += "<a></a>"),
+        }));
+        break;
       default:
         break;
     }
   }
+  publishArticle() {
+    let title = this.state.title;
+    let category = this.state.categories;
+    let materials = this.renderString();
+    return (
+      <div>
+        <div onClick={state === false? state = true: state = false} className={state === false? "hidden": "articleVisb"}>
+          <h3>{title}</h3>
+          <p>
+            <em>{category}</em>
+          </p>
+          <div>{materials}</div>
+        </div>
+      </div>
+    );
+  }
+  clearAll() {
+    this.setState((state) => ({
+      text: (state.text = ""),
+      textCopy: (state.textCopy = ""),
+      categories: (state.categories = ""),
+      title: (state.title = ""),
+      textEdit: (state.textEdit = ""),
+      count: (state.count = 0),
+      numOfstring: (state.numOfstring = 0),
+    }));
+    texts = {};
+  }
   render() {
     return (
       <div>
+        <div>
+          <h2>Create panel</h2>
+        </div>
+        <div>
+          <ul>
+            <li>
+              <button>Publish article</button>
+            </li>
+            <li>
+              <button onClick={this.clearAll} type="button">
+                Clear
+              </button>
+            </li>
+          </ul>
+        </div>
         <form>
           <fieldset>
             <legend>Create an article</legend>
@@ -207,12 +224,20 @@ class Article extends React.Component {
               <li>
                 Enter category:
                 <br />
-                <input id="category" onChange={this.informationAboutArticle} />
+                <input
+                  id="category"
+                  onChange={this.informationAboutArticle}
+                  value={this.state.categories}
+                />
               </li>
               <li>
                 Enter title:
                 <br />
-                <input id="title" onChange={this.informationAboutArticle} />
+                <input
+                  id="title"
+                  onChange={this.informationAboutArticle}
+                  value={this.state.title}
+                />
               </li>
               <ul>
                 <li>
@@ -233,7 +258,9 @@ class Article extends React.Component {
                 </li>
                 <li>
                   Link:
-                  <button>add Link</button>
+                  <button id="link" type="button" onClick={this.addStyleFont}>
+                    add Link
+                  </button>
                 </li>
               </ul>
               <li>
@@ -267,6 +294,9 @@ class Article extends React.Component {
             Text:
             {this.renderString()}
           </div>
+        </div>
+        <div>
+          {this.publishArticle()}
         </div>
       </div>
     );
