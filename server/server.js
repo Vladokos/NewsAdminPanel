@@ -33,7 +33,9 @@ app.post("/text", jsonParser, (req, res) => {
     text: text,
   };
   fs.writeFile("textUsers.json", JSON.stringify(document), (err) => {
-    if (err) throw err
+    if (err){
+      throw err;
+    }
   });
 });
 
