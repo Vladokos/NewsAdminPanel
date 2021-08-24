@@ -6,34 +6,63 @@ const Schema = mongoose.Schema;
 const app = express();
 const jsonParser = express.json();
 
-// const userSchema = new Schema({
-//     category: String,
-//     title: String,
-//     text: String,
-// });
+const articleSchema = new Schema(
+  {
+    category: String,
+    title: String,
+    text: String,
+  },
+  { versionKey: false }
+);
+const Article = mongoose.model("Article", articleSchema);
 
-// mongoose.connect("mongodb://localhost:27017/namedb",{ useUnifiedTopology: true, useNewUrlParser: true });
+mongoose.connect("mongodb://localhost:27017/articles", {
+  useUnifiedTopology: true,
+  useNewUrlParser: true,
+  useFindAndModify: false,
+});
 
-app.get("/text", jsonParser, (req, res) => {
-  fs.readFile("textUsers.json", (err, data) => {
+app.get("/article/:id", (req, res) => {
+  const id = req.params.id;
+  Article.findOne({ _id: id }, (err, article) => {
     if (err) throw err;
-    const result = JSON.parse(data);
-    res.json(result);
+    res.send(article);
   });
 });
 
-app.post("/text", jsonParser, (req, res) => {
+app.post("/article", jsonParser, (req, res) => {
+  if (!req.body) res.sendStatus(400);
+
   const category = req.body.category;
   const title = req.body.titles;
   const text = req.body.texts;
 
-  let document = {
+  const article = new Article({ category: category, title: title, text: text });
+
+  article.save((err) => {
+    if (err) throw err;
+    res.sendStatus(200);
+  });
+});
+
+app.put("/article", jsonParser, (req, res) => {
+  if (!req.body) res.sendStatus(400);
+
+  const id = req.body.id;
+  const category = req.body.category;
+  const title = req.body.titles;
+  const text = req.body.texts;
+
+  const article = {
+    id: id,
     category: category,
     title: title,
     text: text,
   };
-  fs.writeFile("textUsers.json", JSON.stringify(document), (err) => {
+
+  Article.findOneAndUpdate({ _id: id }, article, { new: true }, (err, user) => {
     if (err) throw err;
+    res.sendStatus(200);
   });
 });
 

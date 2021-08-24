@@ -8,9 +8,6 @@ class Panel extends React.Component {
 
     this.state = {};
   }
-  componentDidMount() {
-    fetch("/").then();
-  }
   render() {
     return (
       <div>
@@ -34,12 +31,13 @@ class Article extends React.Component {
       categories: "",
       title: "",
       text: "",
-      textEditIsOpen: false,
+      id: "",
     };
 
     this.informationAboutArticle = this.informationAboutArticle.bind(this);
     this.sendText = this.sendText.bind(this);
     this.getText = this.getText.bind(this);
+    this.clearContent = this.clearContent.bind(this);
   }
 
   informationAboutArticle(inputLine) {
@@ -63,23 +61,49 @@ class Article extends React.Component {
         break;
     }
   }
+
+  clearContent() {
+    this.setState((state) => ({
+      categories: (state.categories = ""),
+      title: (state.title = ""),
+      text: (state.text = ""),
+      id: (state.id = ""),
+    }));
+  }
+
   //Send text on server
   sendText() {
-    fetch("/text", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        category: this.state.categories,
-        titles: this.state.title,
-        texts: this.state.text,
-      }),
-    });
+    if (this.state.id === null || this.state.id === 0) {
+      fetch("/article", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          category: this.state.categories,
+          titles: this.state.title,
+          texts: this.state.text,
+        }),
+      });
+    } else {
+      fetch("/article", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id: this.state.id,
+          category: this.state.categories,
+          titles: this.state.title,
+          texts: this.state.text,
+        }),
+      });
+    }
+    this.clearContent();
   }
   //get text from server
   async getText() {
-    const response = await fetch("/text", {
+    const response = await fetch("/article/6124e969fe7f942128279596", {
       method: "GET",
       headers: {
         Accept: "application/json",
@@ -91,6 +115,7 @@ class Article extends React.Component {
         categories: (state.categories = document.category),
         title: (state.title = document.title),
         text: (state.text = document.text),
+        id: (state.id = document._id),
       }));
     }
   }
@@ -100,18 +125,6 @@ class Article extends React.Component {
       <div>
         <div>
           <h2>Create panel</h2>
-        </div>
-        <div>
-          <ul>
-            <li>
-              <button>Publish article</button>
-            </li>
-            <li>
-              <button onClick={this.clearAll} type="button">
-                Clear
-              </button>
-            </li>
-          </ul>
         </div>
         <form>
           <fieldset>
@@ -135,27 +148,6 @@ class Article extends React.Component {
                   value={this.state.title}
                 />
               </li>
-
-              <ul>
-                <li>
-                  Bold:
-                  <button id="bold" type="button" onClick={this.addStyleFont}>
-                    add bold
-                  </button>
-                </li>
-                <li>
-                  Italic:
-                  <button id="italica" type="button">
-                    add Italic
-                  </button>
-                </li>
-                <li>
-                  Link:
-                  <button id="link" type="button">
-                    add Link
-                  </button>
-                </li>
-              </ul>
               <li>
                 Enter text:
                 <br />
@@ -164,20 +156,9 @@ class Article extends React.Component {
                   onChange={this.informationAboutArticle}
                   value={this.state.text}
                 />
-                <button type="submit" onClick={this.sendText}>
+                <button type="button" onClick={this.sendText}>
                   send
                 </button>
-              </li>
-              <li
-                className={
-                  this.state.textEditIsOpen ? "textEditOpen" : "hidden"
-                }
-              >
-                <textarea
-                  value={this.state.textEdit}
-                  onChange={this.changeParagraph}
-                  onKeyPress={this.keyChekOnEditParagraph}
-                />
               </li>
             </ul>
           </fieldset>
