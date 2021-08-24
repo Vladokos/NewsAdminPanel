@@ -1,6 +1,5 @@
 const express = require("express");
 const mongoose = require("mongoose");
-const fs = require("fs");
 
 const Schema = mongoose.Schema;
 const app = express();
@@ -22,6 +21,13 @@ mongoose.connect("mongodb://localhost:27017/articles", {
   useFindAndModify: false,
 });
 
+app.get("/article/", (req, res) => {
+  Article.find({}, (err, articles) => {
+    if (err) throw err;
+    res.send(articles);
+  });
+});
+
 app.get("/article/:id", (req, res) => {
   const id = req.params.id;
   Article.findOne({ _id: id }, (err, article) => {
@@ -39,9 +45,9 @@ app.post("/article", jsonParser, (req, res) => {
 
   const article = new Article({ category: category, title: title, text: text });
 
-  article.save((err) => {
+  article.save((err, doc) => {
     if (err) throw err;
-    res.sendStatus(200);
+    res.json(doc).status(200);
   });
 });
 
@@ -60,7 +66,16 @@ app.put("/article", jsonParser, (req, res) => {
     text: text,
   };
 
-  Article.findOneAndUpdate({ _id: id }, article, { new: true }, (err, user) => {
+  Article.findOneAndUpdate({ _id: id }, article, { new: true }, (err, doc) => {
+    if (err) throw err;
+    res.json(doc).status(200);
+  });
+});
+
+app.delete("/article/:id", (req, res) => {
+  const id = req.params.id;
+
+  Article.findByIdAndDelete({ _id: id }, (err, doc) => {
     if (err) throw err;
     res.sendStatus(200);
   });

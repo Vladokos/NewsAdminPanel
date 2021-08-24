@@ -32,12 +32,17 @@ class Article extends React.Component {
       title: "",
       text: "",
       id: "",
+      articles: [],
+      textEditing: false,
     };
 
     this.informationAboutArticle = this.informationAboutArticle.bind(this);
-    this.sendText = this.sendText.bind(this);
-    this.getText = this.getText.bind(this);
+    this.sendArticle = this.sendArticle.bind(this);
+    this.getArticle = this.getArticle.bind(this);
     this.clearContent = this.clearContent.bind(this);
+    this.getArticles = this.getArticles.bind(this);
+    this.openAllArticles = this.openAllArticles.bind(this);
+    this.deleteArticle = this.deleteArticle.bind(this);
   }
 
   informationAboutArticle(inputLine) {
@@ -62,6 +67,12 @@ class Article extends React.Component {
     }
   }
 
+  openAllArticles() {
+    this.setState((state) => ({
+      textEditing: !state.textEditing,
+    }));
+  }
+
   clearContent() {
     this.setState((state) => ({
       categories: (state.categories = ""),
@@ -71,13 +82,14 @@ class Article extends React.Component {
     }));
   }
 
-  //Send text on server
-  sendText() {
-    if (this.state.id === null || this.state.id === 0) {
-      fetch("/article", {
+  //Send article on db
+  async sendArticle() {
+    if (this.state.id === null || this.state.id === "") {
+      const response = await fetch("/article", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Accept: "application/json",
         },
         body: JSON.stringify({
           category: this.state.categories,
@@ -85,11 +97,15 @@ class Article extends React.Component {
           texts: this.state.text,
         }),
       });
+      if (response.ok === true) {
+        this.getArticles();
+      }
     } else {
-      fetch("/article", {
+      const response = await fetch("/article", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
+          Accept: "application/json",
         },
         body: JSON.stringify({
           id: this.state.id,
@@ -98,12 +114,16 @@ class Article extends React.Component {
           texts: this.state.text,
         }),
       });
+      if (response.ok === true) {
+        this.getArticles();
+      }
     }
     this.clearContent();
   }
-  //get text from server
-  async getText() {
-    const response = await fetch("/article/6124e969fe7f942128279596", {
+  //get one article from db
+  async getArticle(e) {
+    const id = e.target.value;
+    const response = await fetch("/article/" + id, {
       method: "GET",
       headers: {
         Accept: "application/json",
@@ -116,7 +136,41 @@ class Article extends React.Component {
         title: (state.title = document.title),
         text: (state.text = document.text),
         id: (state.id = document._id),
+        textEditing: (state.textEditing = false),
       }));
+    }
+  }
+
+  //get all article from db
+  async getArticles() {
+    const response = await fetch("/article/", {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+      },
+    });
+    if (response.ok === true) {
+      const document = await response.json();
+      this.setState((state) => ({
+        articles: (state.articles = document),
+      }));
+    }
+  }
+
+  //delete article on db
+  async deleteArticle() {
+    if (this.state.id !== null || this.state.id !== "") {
+      const id = this.state.id;
+      const response = await fetch("/article/" + id, {
+        method: "DELETE",
+        headers: {
+          Accept: "application/json",
+        }
+      });
+      if (response.ok === true) {
+        this.getArticles();
+      }
+      this.clearContent();
     }
   }
 
@@ -156,17 +210,55 @@ class Article extends React.Component {
                   onChange={this.informationAboutArticle}
                   value={this.state.text}
                 />
-                <button type="button" onClick={this.sendText}>
-                  send
-                </button>
               </li>
+              <button type="button" onClick={this.sendArticle}>
+                Send
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  this.getArticles();
+                  this.openAllArticles();
+                }}
+              >
+                Edit
+              </button>
+              <button type="button" onClick={this.deleteArticle}>
+                Delete
+              </button>
             </ul>
           </fieldset>
         </form>
+        {/* Change */}
         <div>
           <div>Category:{this.state.categories}</div>
           <div>Title:{this.state.title}</div>
-          <div onClick={this.getText}>Text:</div>
+        </div>
+        {/* Change */}
+        <div
+          className={this.state.textEditing === false ? "hidden" : "visible"}
+        >
+          All articles:
+          <ul className="articles_list">
+            {this.state.articles.map((article) => (
+              <React.Fragment key={article._id + " fragment"}>
+                <li key={article._id} className="articles">
+                  {article.category}
+                  <br />
+                  {article.title}
+                </li>
+                <button
+                  key={article._id + " button"}
+                  className="article_select"
+                  type="button"
+                  onClick={this.getArticle}
+                  value={article._id}
+                >
+                  select
+                </button>
+              </React.Fragment>
+            ))}
+          </ul>
         </div>
       </div>
     );
