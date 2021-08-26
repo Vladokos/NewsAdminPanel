@@ -1,5 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
+import axios from "axios";
 import "./index.css";
 
 class Panel extends React.Component {
@@ -34,14 +35,16 @@ class Article extends React.Component {
       id: "",
       articles: [],
       textEditing: false,
+      image: null,
     };
 
     this.informationAboutArticle = this.informationAboutArticle.bind(this);
     this.sendArticle = this.sendArticle.bind(this);
+    this.sendImage = this.sendImage.bind(this);
     this.getArticle = this.getArticle.bind(this);
-    this.clearContent = this.clearContent.bind(this);
     this.getArticles = this.getArticles.bind(this);
     this.openAllArticles = this.openAllArticles.bind(this);
+    this.clearContent = this.clearContent.bind(this);
     this.deleteArticle = this.deleteArticle.bind(this);
   }
 
@@ -95,6 +98,7 @@ class Article extends React.Component {
           category: this.state.categories,
           titles: this.state.title,
           texts: this.state.text,
+          image: this.state.text,
         }),
       });
       if (response.ok === true) {
@@ -120,25 +124,55 @@ class Article extends React.Component {
     }
     this.clearContent();
   }
+
+  //send image in server
+  async sendImage() {
+    const data = new FormData();
+    const image = this.state.image;
+    data.append("image", image);
+    axios({
+      config: { headers: { "Content-Type": "multipart/form-data" } },
+      method: "POST",
+      url: "/image",
+      data: data,
+    });
+  }
+
   //get one article from db
   async getArticle(e) {
     const id = e.target.value;
-    const response = await fetch("/article/" + id, {
+    // const response = await fetch("/article/" + id, {
+    //   method: "GET",
+    //   headers: {
+    //     Accept: "application/json",
+    //   },
+    // });
+    const response = await axios({
+      config: { headers: { Accept: "application/json" } },
       method: "GET",
-      headers: {
-        Accept: "application/json",
-      },
+      url: "/article/" + id,
+    }).then(async (response) => {
+      if (response.statusText === "OK") {
+        const document = await response.data;
+        this.setState((state) => ({
+          categories: (state.categories = document.category),
+          title: (state.title = document.title),
+          text: (state.text = document.text),
+          id: (state.id = document._id),
+          textEditing: (state.textEditing = false),
+        }));
+      }
     });
-    if (response.ok === true) {
-      const document = await response.json();
-      this.setState((state) => ({
-        categories: (state.categories = document.category),
-        title: (state.title = document.title),
-        text: (state.text = document.text),
-        id: (state.id = document._id),
-        textEditing: (state.textEditing = false),
-      }));
-    }
+    // if (response.ok === true) {
+    //   const document = await response.json();
+    //   this.setState((state) => ({
+    //     categories: (state.categories = document.category),
+    //     title: (state.title = document.title),
+    //     text: (state.text = document.text),
+    //     id: (state.id = document._id),
+    //     textEditing: (state.textEditing = false),
+    //   }));
+    // }
   }
 
   //get all article from db
@@ -165,7 +199,7 @@ class Article extends React.Component {
         method: "DELETE",
         headers: {
           Accept: "application/json",
-        }
+        },
       });
       if (response.ok === true) {
         this.getArticles();
@@ -185,13 +219,19 @@ class Article extends React.Component {
             <legend>Create an article</legend>
             <ul>
               <li>
-                Enter category:
-                <br />
+                Add preview image: <br />
                 <input
-                  id="category"
-                  onChange={this.informationAboutArticle}
-                  value={this.state.categories}
+                  type="file"
+                  onChange={(e) =>
+                    this.setState((state) => ({
+                      image: (state.image = e.target.files[0]),
+                    }))
+                  }
                 />
+                <br />
+                <button type="button" onClick={this.sendImage}>
+                  Send
+                </button>
               </li>
               <li>
                 Enter title:
@@ -200,6 +240,15 @@ class Article extends React.Component {
                   id="title"
                   onChange={this.informationAboutArticle}
                   value={this.state.title}
+                />
+              </li>
+              <li>
+                Enter category:
+                <br />
+                <input
+                  id="category"
+                  onChange={this.informationAboutArticle}
+                  value={this.state.categories}
                 />
               </li>
               <li>

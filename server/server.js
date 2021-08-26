@@ -1,14 +1,18 @@
 const express = require("express");
 const mongoose = require("mongoose");
+const multer = require("multer");
 
 const Schema = mongoose.Schema;
+
 const app = express();
 const jsonParser = express.json();
+const upload = multer({ dest: "uploads/" });
 
 const articleSchema = new Schema(
   {
     category: String,
     title: String,
+    image: String,
     text: String,
   },
   { versionKey: false }
@@ -70,6 +74,10 @@ app.put("/article", jsonParser, (req, res) => {
     if (err) throw err;
     res.json(doc).status(200);
   });
+});
+
+app.post("/image", upload.single("image"), (req, res, next) => {
+  console.log(req.file);
 });
 
 app.delete("/article/:id", (req, res) => {
