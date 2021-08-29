@@ -1,18 +1,30 @@
+const fs = require("fs");
+
 const express = require("express");
 const mongoose = require("mongoose");
 const multer = require("multer");
+const sharp = require("sharp");
 
 const Schema = mongoose.Schema;
 
 const app = express();
 const jsonParser = express.json();
-const upload = multer({ dest: "uploads/" });
+
+const storageConfig = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "");
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + "" + file.originalname);
+  },
+});
+const upload = multer({ storage: storageConfig }).single("image");
 
 const articleSchema = new Schema(
   {
-    category: String,
-    title: String,
     image: String,
+    title: String,
+    category: String,
     text: String,
   },
   { versionKey: false }
@@ -24,6 +36,8 @@ mongoose.connect("mongodb://localhost:27017/articles", {
   useNewUrlParser: true,
   useFindAndModify: false,
 });
+
+app.use(express.static("uploads"));
 
 app.get("/article/", (req, res) => {
   Article.find({}, (err, articles) => {
@@ -42,7 +56,6 @@ app.get("/article/:id", (req, res) => {
 
 app.post("/article", jsonParser, (req, res) => {
   if (!req.body) res.sendStatus(400);
-
   const category = req.body.category;
   const title = req.body.titles;
   const text = req.body.texts;
@@ -50,6 +63,28 @@ app.post("/article", jsonParser, (req, res) => {
   const article = new Article({ category: category, title: title, text: text });
 
   article.save((err, doc) => {
+    if (err) throw err;
+    res.json(doc).status(200);
+  });
+});
+app.put("/image", upload, (req, res, next) => {
+  const id = req.body.id;
+  const image = req.file.filename;
+
+  sharp(image)
+    .resize(320, 240)
+    .toFile("./uploads/" + image, (err, info) => {
+      if (err) throw err;
+      console.log(info);
+      fs.unlinkSync(image);
+    });
+
+  const article = {
+    id: id,
+    image: image,
+  };
+
+  Article.findByIdAndUpdate({ _id: id }, article, { new: true }, (err, doc) => {
     if (err) throw err;
     res.json(doc).status(200);
   });
@@ -74,10 +109,6 @@ app.put("/article", jsonParser, (req, res) => {
     if (err) throw err;
     res.json(doc).status(200);
   });
-});
-
-app.post("/image", upload.single("image"), (req, res, next) => {
-  console.log(req.file);
 });
 
 app.delete("/article/:id", (req, res) => {

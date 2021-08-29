@@ -98,10 +98,14 @@ class Article extends React.Component {
           category: this.state.categories,
           titles: this.state.title,
           texts: this.state.text,
-          image: this.state.text,
         }),
       });
       if (response.ok === true) {
+        const document = await response.json();
+        this.setState((state) => ({
+          id: (state.id = document._id),
+        }));
+        this.sendImage();
         this.getArticles();
       }
     } else {
@@ -119,6 +123,7 @@ class Article extends React.Component {
         }),
       });
       if (response.ok === true) {
+        this.sendImage();
         this.getArticles();
       }
     }
@@ -129,12 +134,21 @@ class Article extends React.Component {
   async sendImage() {
     const data = new FormData();
     const image = this.state.image;
+    const id = this.state.id;
     data.append("image", image);
-    axios({
+    data.append("id", id);
+    await axios({
       config: { headers: { "Content-Type": "multipart/form-data" } },
-      method: "POST",
+      method: "PUT",
       url: "/image",
       data: data,
+    }).then(async (response) => {
+      if (response.statusText === "OK") {
+        this.setState((state) => ({
+          id: null,
+        }));
+        this.getArticles();
+      }
     });
   }
 
@@ -147,7 +161,7 @@ class Article extends React.Component {
     //     Accept: "application/json",
     //   },
     // });
-    const response = await axios({
+    await axios({
       config: { headers: { Accept: "application/json" } },
       method: "GET",
       url: "/article/" + id,
@@ -229,9 +243,6 @@ class Article extends React.Component {
                   }
                 />
                 <br />
-                <button type="button" onClick={this.sendImage}>
-                  Send
-                </button>
               </li>
               <li>
                 Enter title:
@@ -292,6 +303,8 @@ class Article extends React.Component {
             {this.state.articles.map((article) => (
               <React.Fragment key={article._id + " fragment"}>
                 <li key={article._id} className="articles">
+                  <img src={article.image}></img>
+                  <br />
                   {article.category}
                   <br />
                   {article.title}
