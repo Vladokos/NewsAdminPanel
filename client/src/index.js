@@ -47,6 +47,7 @@ class Article extends React.Component {
     this.openAllArticles = this.openAllArticles.bind(this);
     this.clearContent = this.clearContent.bind(this);
     this.deleteArticle = this.deleteArticle.bind(this);
+    this.addLineBreak = this.addLineBreak.bind(this);
   }
 
   informationAboutArticle(inputLine) {
@@ -84,6 +85,36 @@ class Article extends React.Component {
       categories: (state.categories = ""),
       text: (state.text = ""),
     }));
+  }
+
+  addLineBreak(e) {
+    if (e.charCode === 13) {
+      let state = this.state.text;
+      console.log(this.state.text);
+      let start = e.target.selectionStart;
+      console.log(e.target.selectionStart);
+      let end = e.target.selectionEnd;
+      console.log(e.target.selectionEnd);
+      let tex = "";
+      for (let char of this.state.text) {
+        if (char === "\n") {
+          console.log("aloxa");
+          tex += "<br/>";
+          continue;
+        }
+        console.log(char);
+        tex += char;
+      }
+      console.log(tex);
+      this.setState({
+        text: this.state.text = tex,
+      });
+      console.log(this.state.text);
+
+      // this.setState({
+      //   text: state.substring(0, start) + "<br/><br/>" + state.substring(end),
+      // });
+    }
   }
 
   //Send article on db
@@ -287,6 +318,7 @@ class Article extends React.Component {
                   id="text"
                   onChange={this.informationAboutArticle}
                   value={this.state.text}
+                  onKeyPress={this.addLineBreak}
                 />
               </li>
               <button type="button" onClick={this.sendArticle}>
@@ -311,6 +343,9 @@ class Article extends React.Component {
         <div>
           <div>Category:{this.state.categories}</div>
           <div>Title:{this.state.title}</div>
+          <div
+            dangerouslySetInnerHTML={{ __html: "Text: " + this.state.text }}
+          ></div>
         </div>
         {/* Change */}
         <div
@@ -326,6 +361,8 @@ class Article extends React.Component {
                   {article.category}
                   <br />
                   {article.title}
+                  <br />
+                  <p dangerouslySetInnerHTML={{ __html: article.text }}></p>
                 </li>
                 <button
                   key={article._id + " button"}

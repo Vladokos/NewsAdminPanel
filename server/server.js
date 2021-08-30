@@ -70,6 +70,7 @@ app.post("/article", jsonParser, (req, res) => {
 
 app.put("/image", upload, (req, res) => {
   if (req.file === undefined) {
+    res.send(200);
     throw console.log("req.file is undefinde");
   }
   const id = req.body.id;
@@ -84,7 +85,8 @@ app.put("/image", upload, (req, res) => {
       if (oldImage !== null) {
         fs.access("./uploads/" + oldImage, fs.F_OK, (notFound) => {
           if (notFound) {
-            return;
+            console.log("file not found");
+            return null;
           }
           fs.unlinkSync("./uploads/" + oldImage);
         });
@@ -129,7 +131,7 @@ app.delete("/article/:id", jsonParser, (req, res) => {
 
   fs.access("./uploads/" + image, fs.F_OK, (notFound) => {
     if (notFound) {
-      return;
+      return null;
     }
     fs.unlinkSync("./uploads/" + image);
   });
