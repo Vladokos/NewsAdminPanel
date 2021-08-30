@@ -67,16 +67,28 @@ app.post("/article", jsonParser, (req, res) => {
     res.json(doc).status(200);
   });
 });
-app.put("/image", upload, (req, res, next) => {
+
+app.put("/image", upload, (req, res) => {
+  if (req.file === undefined) {
+    throw console.log("req.file is undefinde");
+  }
   const id = req.body.id;
   const image = req.file.filename;
+  const oldImage = req.body.oldImage;
 
   sharp(image)
     .resize(320, 240)
-    .toFile("./uploads/" + image, (err, info) => {
+    .toFile("./uploads/" + image, (err) => {
       if (err) throw err;
-      console.log(info);
       fs.unlinkSync(image);
+      if (oldImage !== null) {
+        fs.access("./uploads/" + oldImage, fs.F_OK, (notFound) => {
+          if (notFound) {
+            return;
+          }
+          fs.unlinkSync("./uploads/" + oldImage);
+        });
+      }
     });
 
   const article = {
@@ -94,8 +106,8 @@ app.put("/article", jsonParser, (req, res) => {
   if (!req.body) res.sendStatus(400);
 
   const id = req.body.id;
-  const category = req.body.category;
   const title = req.body.titles;
+  const category = req.body.category;
   const text = req.body.texts;
 
   const article = {
@@ -111,8 +123,16 @@ app.put("/article", jsonParser, (req, res) => {
   });
 });
 
-app.delete("/article/:id", (req, res) => {
+app.delete("/article/:id", jsonParser, (req, res) => {
   const id = req.params.id;
+  const image = req.body.image;
+
+  fs.access("./uploads/" + image, fs.F_OK, (notFound) => {
+    if (notFound) {
+      return;
+    }
+    fs.unlinkSync("./uploads/" + image);
+  });
 
   Article.findByIdAndDelete({ _id: id }, (err, doc) => {
     if (err) throw err;

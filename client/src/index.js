@@ -36,6 +36,7 @@ class Article extends React.Component {
       articles: [],
       textEditing: false,
       image: null,
+      oldImage: null,
     };
 
     this.informationAboutArticle = this.informationAboutArticle.bind(this);
@@ -78,10 +79,10 @@ class Article extends React.Component {
 
   clearContent() {
     this.setState((state) => ({
-      categories: (state.categories = ""),
-      title: (state.title = ""),
-      text: (state.text = ""),
       id: (state.id = ""),
+      title: (state.title = ""),
+      categories: (state.categories = ""),
+      text: (state.text = ""),
     }));
   }
 
@@ -117,8 +118,8 @@ class Article extends React.Component {
         },
         body: JSON.stringify({
           id: this.state.id,
-          category: this.state.categories,
           titles: this.state.title,
+          category: this.state.categories,
           texts: this.state.text,
         }),
       });
@@ -134,9 +135,18 @@ class Article extends React.Component {
   async sendImage() {
     const data = new FormData();
     const image = this.state.image;
+    const oldImage = this.state.oldImage;
     const id = this.state.id;
-    data.append("image", image);
-    data.append("id", id);
+
+    if (this.state.oldImage === this.state.image.name) {
+      data.append("image", image);
+      data.append("id", id);
+    } else {
+      data.append("image", image);
+      data.append("oldImage", oldImage);
+      data.append("id", id);
+    }
+
     await axios({
       config: { headers: { "Content-Type": "multipart/form-data" } },
       method: "PUT",
@@ -144,9 +154,9 @@ class Article extends React.Component {
       data: data,
     }).then(async (response) => {
       if (response.statusText === "OK") {
-        this.setState((state) => ({
+        this.setState({
           id: null,
-        }));
+        });
         this.getArticles();
       }
     });
@@ -169,10 +179,12 @@ class Article extends React.Component {
       if (response.statusText === "OK") {
         const document = await response.data;
         this.setState((state) => ({
-          categories: (state.categories = document.category),
-          title: (state.title = document.title),
-          text: (state.text = document.text),
           id: (state.id = document._id),
+          title: (state.title = document.title),
+          categories: (state.categories = document.category),
+          text: (state.text = document.text),
+          image: (state.image = document.image),
+          oldImage: (state.oldImage = document.image),
           textEditing: (state.textEditing = false),
         }));
       }
@@ -209,11 +221,17 @@ class Article extends React.Component {
   async deleteArticle() {
     if (this.state.id !== null || this.state.id !== "") {
       const id = this.state.id;
+      const image = this.state.image;
+      console.log(image);
       const response = await fetch("/article/" + id, {
         method: "DELETE",
         headers: {
+          "Content-Type": "application/json",
           Accept: "application/json",
         },
+        body: JSON.stringify({
+          image: image,
+        }),
       });
       if (response.ok === true) {
         this.getArticles();
@@ -303,7 +321,7 @@ class Article extends React.Component {
             {this.state.articles.map((article) => (
               <React.Fragment key={article._id + " fragment"}>
                 <li key={article._id} className="articles">
-                  <img src={article.image}></img>
+                  <img src={article.image} alt="cart" />
                   <br />
                   {article.category}
                   <br />
