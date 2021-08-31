@@ -32,7 +32,10 @@ class Article extends React.Component {
       categories: "",
       title: "",
       text: "",
+      styleText: "",
+      intermediateText: "",
       id: "",
+      link: "",
       articles: [],
       textEditing: false,
       image: null,
@@ -40,14 +43,16 @@ class Article extends React.Component {
     };
 
     this.informationAboutArticle = this.informationAboutArticle.bind(this);
+    this.openAllArticles = this.openAllArticles.bind(this);
+    this.addLineBreak = this.addLineBreak.bind(this);
+    this.addStyleText = this.addStyleText.bind(this);
+
     this.sendArticle = this.sendArticle.bind(this);
     this.sendImage = this.sendImage.bind(this);
     this.getArticle = this.getArticle.bind(this);
     this.getArticles = this.getArticles.bind(this);
-    this.openAllArticles = this.openAllArticles.bind(this);
     this.clearContent = this.clearContent.bind(this);
     this.deleteArticle = this.deleteArticle.bind(this);
-    this.addLineBreak = this.addLineBreak.bind(this);
   }
 
   informationAboutArticle(inputLine) {
@@ -87,33 +92,88 @@ class Article extends React.Component {
     }));
   }
 
-  addLineBreak(e) {
-    if (e.charCode === 13) {
+  addLineBreak(key) {
+    if (key.charCode === 13) {
       let state = this.state.text;
-      console.log(this.state.text);
-      let start = e.target.selectionStart;
-      console.log(e.target.selectionStart);
-      let end = e.target.selectionEnd;
-      console.log(e.target.selectionEnd);
-      let tex = "";
-      for (let char of this.state.text) {
-        if (char === "\n") {
-          console.log("aloxa");
-          tex += "<br/>";
-          continue;
-        }
-        console.log(char);
-        tex += char;
-      }
-      console.log(tex);
-      this.setState({
-        text: this.state.text = tex,
-      });
-      console.log(this.state.text);
+      let start = key.target.selectionStart;
+      let end = key.target.selectionEnd;
 
-      // this.setState({
-      //   text: state.substring(0, start) + "<br/><br/>" + state.substring(end),
-      // });
+      this.setState({
+        text: state.substring(0, start) + "<br/><br/>" + state.substring(end),
+      });
+    }
+  }
+
+  addStyleText(style) {
+    if (style.charCode === 13 && !style.shiftKey) {
+      switch (style.target.id) {
+        case "bold":
+          this.setState((state) => ({
+            styleText:
+              " <b>" + (state.styleText += style.target.value) + "</b>",
+          }));
+          this.setState((state) => ({
+            text: (state.text += state.styleText),
+            styleText: "",
+          }));
+          break;
+        case "italic":
+          this.setState((state) => ({
+            styleText:
+              " <em>" + (state.styleText += style.target.value) + "</em>",
+          }));
+          this.setState((state) => ({
+            text: (state.text += state.styleText),
+            styleText: "",
+          }));
+          break;
+        case "link":
+          this.setState((state) => ({
+            styleText:
+              "<a href=" +
+              state.link +
+              ">" +
+              (state.styleText += style.target.value) +
+              "</a>",
+          }));
+          this.setState((state) => ({
+            text: (state.text += state.styleText),
+            styleText: "",
+            link: "",
+          }));
+          break;
+        case "list":
+          this.setState((state) => ({
+            styleText:
+              " <ul>" + (state.styleText += state.intermediateText) + "</ul>",
+          }));
+          this.setState((state) => ({
+            text: (state.text += state.styleText),
+            styleText: "",
+          }));
+          break;
+        default:
+          break;
+      }
+    } else if (style.charCode === 13 && style.shiftKey) {
+      switch (style.target.id) {
+        case "list":
+          this.setState({
+            styleText: (this.state.styleText +=
+              "<li>" + style.target.value + "</li>"),
+            intermediateText: (this.state.intermediateText += this.state.styleText),
+          });
+
+          this.setState({
+            styleText: "",
+          });
+
+          style.target.value = "";
+
+          break;
+        default:
+          break;
+      }
     }
   }
 
@@ -336,6 +396,39 @@ class Article extends React.Component {
               <button type="button" onClick={this.deleteArticle}>
                 Delete
               </button>
+            </ul>
+            <ul>
+              style:
+              <li>
+                Add bold: &lt;b&gt;
+                <input id="bold" onKeyPress={this.addStyleText} />
+                &lt;/b&gt;
+              </li>
+              <li>
+                Add italic: &lt;em&gt;
+                <input id="italic" onKeyPress={this.addStyleText} /> &lt;/em&gt;
+              </li>
+              <li>
+                Add link: &lt;a href=
+                <input
+                  id="href"
+                  onChange={(e) => {
+                    this.setState((state) => ({
+                      link: (state.link = e.target.value),
+                    }));
+                  }}
+                />
+                &gt; <input id="link" onKeyPress={this.addStyleText} />
+                &lt;/a&gt;
+              </li>
+              <li>
+                Add list: &lt;ul&gt; &lt;li&gt;{" "}
+                <input id="list" onKeyPress={this.addStyleText} /> &lt;/li&gt;
+                &lt;/ul&gt;
+                <br />
+                to add the next line in the list press shift + enter.
+                When you will be done press enter
+              </li>
             </ul>
           </fieldset>
         </form>
