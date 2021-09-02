@@ -56,6 +56,7 @@ app.get("/article/:id", (req, res) => {
 
 app.post("/article", jsonParser, (req, res) => {
   if (!req.body) res.sendStatus(400);
+
   const category = req.body.category;
   const title = req.body.titles;
   const text = req.body.texts;
@@ -70,7 +71,7 @@ app.post("/article", jsonParser, (req, res) => {
 
 app.put("/image", upload, (req, res) => {
   if (req.file === undefined) {
-    res.send(200);
+    res.sendStatus(200);
     throw console.log("req.file is undefinde");
   }
   const id = req.body.id;
