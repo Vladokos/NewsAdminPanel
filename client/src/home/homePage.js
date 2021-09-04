@@ -12,14 +12,15 @@ class HomePage extends React.Component {
       ids: 0,
     };
   }
-  getID(id) {
-    this.setState({ ids: id });
-    console.log(id);
-  }
+  //bug
+  // getID(id) {
+  //   this.setState({ ids: id });
+  //   console.log(id);
+  // }
   render() {
     return (
       <div>
-        <AllArticle getID={this.getID()} />
+        <AllArticle  />
       </div>
     );
   }
