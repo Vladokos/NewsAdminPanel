@@ -1,7 +1,6 @@
 import React from "react";
 import axios from "axios";
-import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
-import Article from "./article.js";
+import { Link } from "react-router-dom";
 
 
 class AllArticle extends React.Component {
@@ -24,7 +23,6 @@ class AllArticle extends React.Component {
         this.setState((state) => ({
           articles: (state.articles = document),
         }));
-        console.log(this.state.articles);
       }
     });
   }
@@ -35,32 +33,28 @@ class AllArticle extends React.Component {
         <h1>Home Page</h1>
         <div>
           <h2>Articles:</h2>
-          <Router>
-            <div className="articles_roster">
-              {this.state.articles.map((article) => (
-                <Link to={"/article/" + article._id}>
-                  <div key={article._id + " fragment"}>
-                    <picture>
-                      <img src={article.image} />
-                    </picture>
-                    <br />
-                    <br />
-                    <span className="title_articles">{article.title}</span>
-                    <br />
-                    <br />
-                    <span className="category_articles">
-                      {article.category}
-                    </span>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </Router>
+
+          <div className="articles_roster">
+            {this.state.articles.map((article) => (
+              <Link to={"/article/" + article._id} key={article._id + "link"}>
+                <div key={article._id + " fragment"}   >
+                  <picture>
+                    <img key={article._id + "img"}  src={article.image} alt="" />
+                  </picture>
+                  <br />
+                  <br />
+                  <span key={article._id + "title"}  className="title_articles" >{article.title}</span>
+                  <br />
+                  <br />
+                  <span key={article._id + "category"}  className="category_articles" >{article.category}</span>
+                </div>
+              </Link>
+            ))}
+          </div>
         </div>
       </div>
     );
   }
 }
-
 
 export default AllArticle;

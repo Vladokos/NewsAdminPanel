@@ -429,7 +429,7 @@ class CreateArticle extends React.Component {
             {this.state.articles.map((article) => (
               <React.Fragment key={article._id + " fragment"}>
                 <li key={article._id} className="articles">
-                  <img src={article.image} />
+                  <img src={article.image} alt="" />
                   <br />
                   {article.category}
                   <br />

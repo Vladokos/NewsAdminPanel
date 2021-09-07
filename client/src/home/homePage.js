@@ -1,6 +1,5 @@
 import React from "react";
-import axios from "axios";
-import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
+import { BrowserRouter as Router, Route } from "react-router-dom";
 import AllArticle from "./allArticle.js";
 import Article from "./article.js";
 
@@ -9,31 +8,32 @@ class HomePage extends React.Component {
     super(props);
 
     this.state = {
-      ids: 0,
+      id: 0,
     };
+
+    this.getID = this.getID.bind(this);
   }
   //bug
-  // getID(id) {
-  //   this.setState({ ids: id });
-  //   console.log(id);
-  // }
+  getID(ids) {
+    this.setState({
+      id: (this.state.id = ids),
+    });
+    console.log(this.state.id);
+  }
   render() {
     return (
-      <div>
-        <AllArticle  />
-      </div>
+      <Router>
+        <div>
+          <Route path="/article"  >
+            <Article/>
+          </Route>
+          <Route path="/" exact>
+            <AllArticle/>
+          </Route>
+        </div>
+      </Router>
     );
   }
-  
-}
-{
-  /* <Switch>
-              {this.state.articles.map((article) => (
-                <Route path={"/article/" + article._id}>
-                  <Article articleId={article._id} />
-                </Route>
-              ))}
-            </Switch> */
 }
 
 export default HomePage;

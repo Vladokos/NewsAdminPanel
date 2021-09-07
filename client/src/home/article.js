@@ -6,35 +6,39 @@ class Article extends React.Component {
     super(props);
 
     this.state = {
-      articleId: props.articleId,
+      articleId: 0,
       article: [],
     };
-
-    this.getArticle = this.getArticle.bind(this);
   }
 
-  getArticle() {
-    console.log(this.state.articleId);
-    axios({
-      config: { headers: { Accept: "application/json" } },
-      method: "GET",
-      url: "/article/" + this.state.articleId,
-    }).then(async (response) => {
-      if (response.statusText === "OK") {
-        const document = await response.data;
-        this.setState((state) => ({
-          article: (state.article = document),
-        }));
-        console.log(this.state.article);
-      }
+  componentDidMount() {
+    let str = window.location.href;
+    str = str.substr(30);
+    this.setState({
+      articleId: (this.state.articleId = str),
     });
-    console.log("its work");
+    console.log(this.state.articleId);
+
+    if (this.state.articleId !== 0) {
+      axios({
+        config: { headers: { Accept: "application/json" } },
+        method: "GET",
+        url: "/article/" + this.state.articleId,
+      }).then(async (response) => {
+        if (response.statusText === "OK") {
+          const document = await response.data;
+          this.setState((state) => ({
+            article: (state.article = document),
+          }));
+          console.log(this.state.article);
+        }
+      });
+    }
   }
 
   render() {
     return (
       <div>
-        <button onClick={this.getArticle}>click me</button>
         <div>
           <span className="title_article">{this.state.article.title}</span>
           <br />
@@ -50,7 +54,6 @@ class Article extends React.Component {
             ></p>
           </div>
         </div>
-        {this.state.articleId}
       </div>
     );
   }
