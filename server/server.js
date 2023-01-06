@@ -70,6 +70,7 @@ app.post("/article", jsonParser, (req, res) => {
 });
 
 app.put("/image", upload, (req, res) => {
+  console.log(req.body)
   if (req.file === undefined) {
     res.sendStatus(200);
     throw console.log("req.file is undefinde");
