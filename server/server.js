@@ -70,21 +70,22 @@ app.post("/article", jsonParser, (req, res) => {
 });
 
 app.put("/image", upload, (req, res) => {
-  console.log(req.body)
   if (req.file === undefined) {
     res.sendStatus(200);
-    throw console.log("req.file is undefinde");
+    return console.log("req.file is undefined");
   }
+ 
   const id = req.body.id;
   const image = req.file.filename;
   const oldImage = req.body.oldImage;
+
 
   sharp(image)
     .resize(320, 240)
     .toFile("./uploads/" + image, (err) => {
       if (err) throw err;
       fs.unlinkSync(image);
-      if (oldImage !== null) {
+      if (oldImage.length > 0) {
         fs.access("./uploads/" + oldImage, fs.F_OK, (notFound) => {
           if (notFound) {
             console.log("file not found");
@@ -102,7 +103,7 @@ app.put("/image", upload, (req, res) => {
 
   Article.findByIdAndUpdate({ _id: id }, article, { new: true }, (err, doc) => {
     if (err) throw err;
-    res.json(doc).status(200);
+    return res.json(doc).status(200);
   });
 });
 
