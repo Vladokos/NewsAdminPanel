@@ -4,11 +4,14 @@ const express = require("express");
 const mongoose = require("mongoose");
 const multer = require("multer");
 const sharp = require("sharp");
+const path = require("path");
 
 const Schema = mongoose.Schema;
 
 const app = express();
 const jsonParser = express.json();
+
+app.use(express.static(path.join(__dirname + "/public")));
 
 const storageConfig = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -31,18 +34,21 @@ const articleSchema = new Schema(
 );
 const Article = mongoose.model("Article", articleSchema);
 
-mongoose.connect("mongodb://localhost:27017/articles", {
-  useUnifiedTopology: true,
-  useNewUrlParser: true,
-  useFindAndModify: false,
-});
+mongoose.connect(
+  "mongodb+srv://Test:<I9QRamgAooLR9oVh>@cluster1.akqdd4m.mongodb.net/?retryWrites=true&w=majority",
+  {
+    useUnifiedTopology: true,
+    useNewUrlParser: true,
+    useFindAndModify: false,
+  }
+);
 
 app.use(express.static("uploads"));
 
 app.get("/article/", (req, res) => {
   Article.find({}, (err, articles) => {
     if (err) throw err;
-    res.send(articles);
+    return res.send(articles);
   });
 });
 
@@ -50,7 +56,7 @@ app.get("/article/:id", (req, res) => {
   const id = req.params.id;
   Article.findOne({ _id: id }, (err, article) => {
     if (err) throw err;
-    res.send(article);
+    return res.send(article);
   });
 });
 
@@ -65,7 +71,7 @@ app.post("/article", jsonParser, (req, res) => {
 
   article.save((err, doc) => {
     if (err) throw err;
-    res.json(doc).status(200);
+    return res.json(doc).status(200);
   });
 });
 
@@ -74,11 +80,10 @@ app.put("/image", upload, (req, res) => {
     res.sendStatus(200);
     return console.log("req.file is undefined");
   }
- 
+
   const id = req.body.id;
   const image = req.file.filename;
   const oldImage = req.body.oldImage;
-
 
   sharp(image)
     .resize(320, 240)
@@ -124,7 +129,7 @@ app.put("/article", jsonParser, (req, res) => {
 
   Article.findOneAndUpdate({ _id: id }, article, { new: true }, (err, doc) => {
     if (err) throw err;
-    res.json(doc).status(200);
+    return res.json(doc).status(200);
   });
 });
 
@@ -141,7 +146,7 @@ app.delete("/article/:id", jsonParser, (req, res) => {
 
   Article.findByIdAndDelete({ _id: id }, (err, doc) => {
     if (err) throw err;
-    res.sendStatus(200);
+    return res.sendStatus(200);
   });
 });
 
