@@ -33,15 +33,12 @@ const articleSchema = new Schema(
   { versionKey: false }
 );
 const Article = mongoose.model("Article", articleSchema);
-
-mongoose.connect(
-  "mongodb+srv://Test:<I9QRamgAooLR9oVh>@cluster1.akqdd4m.mongodb.net/?retryWrites=true&w=majority",
-  {
-    useUnifiedTopology: true,
-    useNewUrlParser: true,
-    useFindAndModify: false,
-  }
-);
+// mongodb+srv://Test:<I9QRamgAooLR9oVh>@cluster1.akqdd4m.mongodb.net/?retryWrites=true&w=majority
+mongoose.connect("mongodb://localhost:27017/articles", {
+  useUnifiedTopology: true,
+  useNewUrlParser: true,
+  useFindAndModify: false,
+});
 
 app.use(express.static("uploads"));
 
