@@ -372,7 +372,7 @@ export default class CreateArticle extends React.Component<Props, State> {
                 <input
                   id="italic"
                   onKeyDown={(e) => this.addStyleText(e)}
-                />{" "}
+                />
                 &lt;/em&gt;
               </li>
               <li>
@@ -389,8 +389,8 @@ export default class CreateArticle extends React.Component<Props, State> {
                 &lt;/a&gt;
               </li>
               <li>
-                Add list: &lt;ul&gt; &lt;li&gt;{" "}
-                <input id="list" onKeyDown={(e) => this.addStyleText(e)} />{" "}
+                Add list: &lt;ul&gt; &lt;li&gt;
+                <input id="list" onKeyDown={(e) => this.addStyleText(e)} />
                 &lt;/li&gt; &lt;/ul&gt;
                 <br />
                 <b>
@@ -406,7 +406,7 @@ export default class CreateArticle extends React.Component<Props, State> {
             </ul>
           </fieldset>
         </form>
-        {/* Change */}
+        
         <div>
           <div>Category:{this.state.categories}</div>
           <div>Title:{this.state.title}</div>
@@ -414,7 +414,7 @@ export default class CreateArticle extends React.Component<Props, State> {
             dangerouslySetInnerHTML={{ __html: "Text: " + this.state.text }}
           ></div>
         </div>
-        {/* Change */}
+        
         <div
           className={this.state.textEditing === false ? "hidden" : "visible"}
         >
