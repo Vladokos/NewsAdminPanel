@@ -11,10 +11,10 @@ export default class Panel extends React.Component {
       <div>
         <Router>
           <Switch>
-            <Route path="/">
+            <Route path="/api/admin_panel">
               <CreateArticle/>
             </Route>
-            <Route path="/api/admin_panel">
+            <Route path="/">
               <HomePage />
             </Route>
           </Switch>
