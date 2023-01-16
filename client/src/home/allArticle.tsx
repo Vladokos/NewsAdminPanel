@@ -18,9 +18,11 @@ export default class AllArticle extends React.Component<Props, State> {
     axios.get("/article/").then((response) => {
       if (response.statusText === "OK") {
         const document: Array<Articles> = response.data;
+        
         this.setState((state) => ({
           articles: document,
         }));
+       
       }
     });
   }
