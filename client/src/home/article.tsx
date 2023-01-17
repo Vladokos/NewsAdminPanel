@@ -32,7 +32,6 @@ export default class Article extends React.Component<Props, State> {
             articleData: document,
           }));
 
-          console.log(this.state.articleData[0].title);
         }
       });
     }
