@@ -12,7 +12,8 @@ const app = express();
 const jsonParser = express.json();
 
 app.use(express.static(path.join(__dirname + "/public")));
-
+// rewrite to SQL
+// 'cause MongoDB is not working in Russia
 const storageConfig = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, "");
