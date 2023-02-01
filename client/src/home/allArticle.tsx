@@ -37,20 +37,20 @@ export default class AllArticle extends React.Component<Props, State> {
           <div className="articles_roster">
             {this.state.articles.map((article) => (
            
-              <Link to={"/article/" + article._id} key={article._id + "link"}>
-                <div key={article._id + " fragment"}>
+              <Link to={"/article/" + article.id} key={article.id + "link"}>
+                <div key={article.id + " fragment"}>
                   <picture>
-                    <img key={article._id + "img"} src={article.image} alt="" />
+                    <img key={article.id + "img"} src={article.image} alt="" />
                   </picture>
                   <br />
                   <br />
-                  <span key={article._id + "title"} className="title_articles">
+                  <span key={article.id + "title"} className="title_articles">
                     {article.title}
                   </span>
                   <br />
                   <br />
                   <span
-                    key={article._id + "category"}
+                    key={article.id + "category"}
                     className="category_articles"
                   >
                     {article.category}
