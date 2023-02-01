@@ -12,7 +12,7 @@ type State = {
   text: string;
   styleText: string;
   intermediateText: string;
-  id: string;
+  id: number;
   link: string;
   articles: Array<Articles>;
   textEditing: boolean;
@@ -28,7 +28,7 @@ export default class CreateArticle extends React.Component<Props, State> {
     text: "",
     styleText: "",
     intermediateText: "",
-    id: "",
+    id: 0,
     link: "",
     articles: [],
     textEditing: false,
@@ -71,7 +71,7 @@ export default class CreateArticle extends React.Component<Props, State> {
 
   clearContent() {
     this.setState((state) => ({
-      id: "",
+      id: 0,
       title: "",
       categories: "",
       text: "",
@@ -163,7 +163,7 @@ export default class CreateArticle extends React.Component<Props, State> {
   }
 
   sendArticle() {
-    if (this.state.id === null || this.state.id === "") {
+    if (this.state.id === null || this.state.id === 0) {
       const options: AxiosRequestConfig = {
         method: "POST",
         url: "/article",
@@ -176,9 +176,10 @@ export default class CreateArticle extends React.Component<Props, State> {
       };
       axios.request(options).then((response) => {
         if (response.statusText === "OK") {
-          const document = response.data;
+          const document = response.data.id;
+          console.log(document)
           this.setState((state) => ({
-            id: document._id,
+            id: document,
           }));
           this.sendImage();
           this.getArticles();
@@ -211,15 +212,15 @@ export default class CreateArticle extends React.Component<Props, State> {
     const image = this.state.image!;
     const oldImage = this.state.oldImage;
     const id = this.state.id;
-
+    
     try {
       if (this.state.oldImage === this.state.image?.name) {
         data.append("image", image);
-        data.append("id", id);
+        data.append("id", id.toString());
       } else {
         data.append("image", image);
         data.append("oldImage", oldImage);
-        data.append("id", id);
+        data.append("id", id.toString());
       }
     } catch (Exception) {}
 
@@ -231,7 +232,7 @@ export default class CreateArticle extends React.Component<Props, State> {
     }).then((response) => {
       if (response.statusText === "OK") {
         this.setState({
-          id: "",
+          id: 0,
         });
         this.getArticles();
       }
@@ -243,15 +244,15 @@ export default class CreateArticle extends React.Component<Props, State> {
 
     axios.get(`/article/${id}`).then((response) => {
       if (response.statusText === "OK") {
-        const document: Articles = response.data;
-
+        const document: Array<Articles> = response.data;
+        
         this.setState((state) => ({
-          id: (this.state.id = document._id),
-          title: (this.state.title = document.title),
-          categories: (this.state.categories = document.category),
-          text: (this.state.text = document.text),
-          imageName: (this.state.imageName = document.image),
-          oldImage: (this.state.oldImage = document.image),
+          id: (this.state.id = document[0].id),
+          title: (this.state.title = document[0].title),
+          categories: (this.state.categories = document[0].category),
+          text: (this.state.text = document[0].text),
+          imageName: (this.state.imageName = document[0].image),
+          oldImage: (this.state.oldImage = document[0].image),
           textEditing: (this.state.textEditing = false),
         }));
       }
@@ -421,8 +422,8 @@ export default class CreateArticle extends React.Component<Props, State> {
           All articles:
           <ul className="articles_list">
             {this.state.articles.map((article) => (
-              <React.Fragment key={article._id + " fragment"}>
-                <li key={article._id} className="articles">
+              <React.Fragment key={article.id + " fragment"}>
+                <li key={article.id} className="articles">
                   <img src={"../" + article.image} alt="" />
                   <br />
                   {article.category}
@@ -432,11 +433,11 @@ export default class CreateArticle extends React.Component<Props, State> {
                   <p dangerouslySetInnerHTML={{ __html: article.text }}></p>
                 </li>
                 <button
-                  key={article._id + " button"}
+                  key={article.id + " button"}
                   className="article_select"
                   type="button"
                   onClick={(e) => this.getArticle(e)}
-                  value={article._id}
+                  value={article.id}
                 >
                   select
                 </button>
