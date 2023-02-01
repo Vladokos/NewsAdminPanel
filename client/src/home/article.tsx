@@ -24,9 +24,9 @@ export default class Article extends React.Component<Props, State> {
     });
 
     if (this.state.articleId.trim().length > 0) {
-      axios.get(`/article/${this.state.articleId}`).then(async (response) => {
+      axios.get(`/article/${this.state.articleId}`).then((response) => {
         if (response.statusText === "OK") {
-          const document: Array<ArticleInterface> = [await response.data];
+          const document: Array<ArticleInterface> = response.data;
 
           this.setState((state) => ({
             articleData: document,
@@ -35,6 +35,7 @@ export default class Article extends React.Component<Props, State> {
         }
       });
     }
+  
   }
 
   render(): React.ReactNode {
