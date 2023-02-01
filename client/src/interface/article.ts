@@ -5,7 +5,7 @@ export interface ArticleInterface{
 }
 
 export interface Articles{
-    _id:string,
+    id:number,
     category: string,
     title: string,
     text: string,
