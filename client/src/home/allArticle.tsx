@@ -13,7 +13,7 @@ export default class AllArticle extends React.Component<Props, State> {
   state: State = {
     articles: [],
   };
-
+  //add env to address request 
   componentDidMount() {
     axios.get("/article/").then((response) => {
       if (response.statusText === "OK") {
